@@ -55,6 +55,12 @@ namespace Greed.Game.Directing
                 Point position = new Point (x,z);
                 position = position.Scale(15);
 
+                int vx = random.Next(-3, 5);
+                int vy = random.Next(-3, 5);
+                Point velocity = new Point (vx, vy);
+                velocity = position.Scale(15);
+
+
                 int r = random.Next(0,256);
                 int g = random.Next(0,256);
                 int b = random.Next(0,256);
@@ -105,10 +111,9 @@ namespace Greed.Game.Directing
                 if (miner.GetPosition().Equals(collectable.GetPosition()))
                 {
                     // TODO: Create the score class
-
             
                     int points = ((Score) collectable).GetPoints();
-                    // ((Score)score).AddPoints(points);
+                    ((Score)score).AddPoints(points);
                     cast.RemoveActor("collectables"), collectables;
                 }
 

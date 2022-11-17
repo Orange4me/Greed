@@ -81,6 +81,13 @@ namespace Unit04
                 cast.AddActor("artifacts", artifact);
             }
 
+                Score score = new Score();
+                score.SetFontSize(15);
+                score.SetColor(color);
+                score.SetPosition(position);
+                score.AddPoints(points);
+                cast.AddActor("score", score);
+                
             // start the game
             KeyboardService keyboardService = new KeyboardService(CELL_SIZE);
             VideoService videoService 
