@@ -7,16 +7,13 @@ namespace Greed.Game.Casting
 
     public Score()
     {
-
-    }
-    public int GetPoints()
-    {
-        return _points;
+        
     }
 
-    public void SetPoints(int points)
+    public void AddPoints(int points)
     {
-        _points = points;
+        _points += points;
+        SetTest($"Score: {_points}");
     }
 
     }

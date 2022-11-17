@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Greed.Game.Casting;
 using Greed.Game.Services;
@@ -5,32 +6,17 @@ using Greed.Game.Services;
 
 namespace Greed.Game.Directing
 {
-    /// <summary>
-    /// <para>A person who directs the game.</para>
-    /// <para>
-    /// The responsibility of a Director is to control the sequence of play.
-    /// </para>
-    /// </summary>
     public class Director
     {
         private KeyboardService _keyboardService = null;
         private VideoService _videoService = null;
 
-        /// <summary>
-        /// Constructs a new instance of Director using the given KeyboardService and VideoService.
-        /// </summary>
-        /// <param name="keyboardService">The given KeyboardService.</param>
-        /// <param name="videoService">The given VideoService.</param>
         public Director(KeyboardService keyboardService, VideoService videoService)
         {
             this._keyboardService = keyboardService;
             this._videoService = videoService;
         }
 
-        /// <summary>
-        /// Starts the game by running the main game loop for the given cast.
-        /// </summary>
-        /// <param name="cast">The given cast.</param>
         public void StartGame(Cast cast)
         {
             _videoService.OpenWindow();
@@ -43,37 +29,106 @@ namespace Greed.Game.Directing
             _videoService.CloseWindow();
         }
 
-        /// <summary>
-        /// Gets directional input from the keyboard and applies it to the robot.
-        /// </summary>
-        /// <param name="cast">The given cast.</param>
         private void GetInputs(Cast cast)
         {
-            Actor robot = cast.GetFirstActor("robot");
+            Actor minor = cast.GetFirstActor("minor");
             Point velocity = _keyboardService.GetDirection();
-            robot.SetVelocity(velocity);     
+            int x = velocity.GetX();
+            int y = 0;
+            velocity = new Point(x, y);
+            minor.SetVelocity(velocity);     
         }
 
-        /// <summary>
-        /// Updates the robot's position and resolves any collisions with artifacts.
-        /// </summary>
-        /// <param name="cast">The given cast.</param>
         private void DoUpdates(Cast cast)
         {
-            Actor banner = cast.GetFirstActor("banner");
-            Actor robot = cast.GetFirstActor("robot");
-            List<Actor> artifacts = cast.GetActors("artifacts");
+            // Delete?
+            // Actor miner = cast.GetFirstActor("miner");
+            // Actor score = cast.GetFirstActor("score");
+            // List<Actor> Collectables = cast.GetActors("Collectables");
+
+            // 1. spawn new collectables (randomize them)
+            Random random = new Random();
+            for (int i = 0; i < 23; i++)
+            {
+                int x = random.Next(1, 60);
+                int y = 0;
+                Point position = new Point (x,z);
+                position = position.Scale(15);
+
+                int r = random.Next(0,256);
+                int g = random.Next(0,256);
+                int b = random.Next(0,256);
+
+                Color color = new Color (r, g, b);
+
+                string Symbol = "*";
+                int points = 20;
+                int isRock = random.Next(0,2);
+                if (isRock ==1);
+                    {
+                        symbol = "@";
+                        points = -20;
+                    }
+
+                Score collectable= new Collectable();
+                collectable.SetText (symbol);
+                collectable.SetFontSize(15);
+                collectable.SetColor(color);
+                collectable.SetPosition(position);
+                collectable.SetVelocity(new Point (0, 3));
+                collectable.SetPoints(points);
+                cast.AddActor("collectables", collectable);
+
+
+            }
+            // 2. handle collisions between the minor and the collectables
+
+            Actor miner = cast.GetFirstActor("miner");
+            Actor score = cast.GetFirstActor("score");
+            List<Actor> collectables = cast.GetActors("collectables");
+
+
+
+            // 3. Move all the actors
+            
+            int maxX = _videoService.GetWidth();
+            int maxY = _videoService.GetHeight();
+
+            miner.MoveNext (maxX, maxY);
+            foreach (Actor collectable in collectables)
+            {
+                collectables.MoveNext (maxX, maxY);
+            }
+            // 4. handle collisions between the minor and collectables
+            foreach (Actor collectable in collectables)
+            {
+                if (miner.GetPosition().Equals(collectable.GetPosition()))
+                {
+                    // TODO: Create the score class
+
+            
+                    int points = ((Score) collectable).GetPoints();
+                    // ((Score)score).AddPoints(points);
+                    cast.RemoveActor("collectables"), collectables;
+                }
+
+            public void DoOutputs(Cast cast)
+            {
+                List<Actors> actors = cast.GetActors("collectables");
+
+            }
+
 
             banner.SetText("");
             int maxX = _videoService.GetWidth();
             int maxY = _videoService.GetHeight();
             robot.MoveNext(maxX, maxY);
 
-            foreach (Actor actor in artifacts)
+            foreach (Actor collectable in collectables)
             {
-                if (robot.GetPosition().Equals(actor.GetPosition()))
+                if (robot.GetPosition().Equals(collectable.GetPosition()))
                 {
-                    Artifact artifact = (Artifact) actor;
+                    Artifact artifact = (Artifact) collectable;
                     string message = artifact.GetMessage();
                     banner.SetText(message);
                 }
